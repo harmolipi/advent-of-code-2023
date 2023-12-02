@@ -22,21 +22,56 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	pattern := regexp.MustCompile(`\d`)
 	calibrationTotal := 0
+	counter := 0
 
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		lineDigits := pattern.FindAllString(scanner.Text(), -1)
-		calibrationString := lineDigits[0] + lineDigits[len(lineDigits)-1]
-
-		calibrationValue, err := strconv.Atoi(calibrationString)
-		if err != nil {
-			log.Fatal("There was an error parsing the calibration value!")
-		}
-
-		calibrationTotal += calibrationValue
+		calibrationTotal += getCalibrationValue(scanner.Text(), counter)
+		counter++
 	}
 
 	fmt.Println(calibrationTotal)
+}
+
+func getCalibrationValue(line string, count int) int {
+	numberMap := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
+	}
+
+	pattern := regexp.MustCompile(`\d|one|two|three|four|five|six|seven|eight|nine`)
+
+	var matches []string
+
+	for i := range line {
+		foundMatch := pattern.FindString(line[i:])
+		if foundMatch != "" {
+			matches = append(matches, foundMatch)
+		}
+	}
+
+	firstDigit, ok := numberMap[matches[0]]
+	if !ok {
+		firstDigit = matches[0]
+	}
+
+	secondDigit, ok := numberMap[matches[len(matches)-1]]
+	if !ok {
+		secondDigit = matches[len(matches)-1]
+	}
+
+	calibrationValue, err := strconv.Atoi(firstDigit + secondDigit)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return calibrationValue
 }
