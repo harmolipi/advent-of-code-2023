@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
@@ -87,17 +88,25 @@ func (cubeBag *cubeSet) canContain(containedCubeSet cubeSet) bool {
 		cubeBag.blue >= containedCubeSet.blue
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Please include the filepath as an argument.")
+// minCubes returns the minimum cubeSet required for thisGame to be a valid game
+func (thisGame *game) minCubes() cubeSet {
+	minCubeSet := newCubeSet(0, 0, 0)
+	for _, v := range thisGame.rounds {
+		if v.red > minCubeSet.red {
+			minCubeSet.red = v.red
+		}
+
+		if v.green > minCubeSet.green {
+			minCubeSet.green = v.green
+		}
+
+		if v.blue > minCubeSet.blue {
+			minCubeSet.blue = v.blue
+		}
 	}
 
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer file.Close()
+	return *minCubeSet
+}
 
 // displayValidIdTotal displays the total of all IDs of valid games
 func displayValidIdTotal(file *os.File) {
@@ -123,6 +132,21 @@ func displayValidIdTotal(file *os.File) {
 	fmt.Printf("Total of valid game IDs: %v\n", idTotal)
 }
 
+// displayTotalPowerOfCubes displays the total of all games' cubeSets' powers
+func displayTotalPowerOfCubes(file *os.File) {
+	scanner := bufio.NewScanner(file)
+	totalPower := 0
+
+	for scanner.Scan() {
+		currentGame := newGame(scanner.Text())
+		currentMinCubes := currentGame.minCubes()
+
+		totalPower += (currentMinCubes.red * currentMinCubes.green * currentMinCubes.blue)
+	}
+
+	fmt.Printf("Total power of all min cubesets: %v\n", totalPower)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Please include the filepath as an argument.")
@@ -136,4 +160,11 @@ func main() {
 	defer file.Close()
 
 	displayValidIdTotal(file)
+
+	_, seekErr := file.Seek(0, io.SeekStart)
+	if seekErr != nil {
+		log.Fatal(seekErr)
+	}
+
+	displayTotalPowerOfCubes(file)
 }
