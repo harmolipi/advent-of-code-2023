@@ -99,6 +99,8 @@ func main() {
 
 	defer file.Close()
 
+// displayValidIdTotal displays the total of all IDs of valid games
+func displayValidIdTotal(file *os.File) {
 	idTotal := 0
 	scanner := bufio.NewScanner(file)
 	mainCubeSet := newCubeSet(12, 13, 14)
@@ -119,4 +121,19 @@ func main() {
 	}
 
 	fmt.Printf("Total of valid game IDs: %v\n", idTotal)
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		log.Fatal("Please include the filepath as an argument.")
+	}
+
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+
+	displayValidIdTotal(file)
 }
