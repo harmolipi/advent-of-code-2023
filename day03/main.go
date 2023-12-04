@@ -58,27 +58,7 @@ func (num partNum) isAdjacentToSymbol(schematic []string) bool {
 	return hasAdjacentSymbol
 }
 
-func main() {
-	filePath := ""
-	if len(os.Args) < 2 {
-		log.Fatal("Please include the input file as an argment.")
-	}
-
-	filePath = os.Args[1]
-
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var schematic []string
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		schematic = append(schematic, line)
-	}
-
+func getPartNumTotal(schematic []string) int {
 	total := 0
 	partNumPattern := regexp.MustCompile(`\d+\b`)
 
@@ -101,6 +81,32 @@ func main() {
 			}
 		}
 	}
+
+	return total
+}
+
+func main() {
+	filePath := ""
+	if len(os.Args) < 2 {
+		log.Fatal("Please include the input file as an argment.")
+	}
+
+	filePath = os.Args[1]
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var schematic []string
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		schematic = append(schematic, line)
+	}
+
+	total := getPartNumTotal(schematic)
 
 	fmt.Printf("The total is: %v\n", total)
 }
