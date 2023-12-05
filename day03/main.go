@@ -27,7 +27,10 @@ func (num partNum) isAdjacentToSymbol(schematic []string) bool {
 	var allAdjacentValues []coordinate
 
 	for i := range num.id {
-		currentAdjacentValues := getAdjacentCoordinates(coordinate{x: (num.x + i), y: num.y}, schematic)
+		currentAdjacentValues := getAdjacentCoordinates(
+			coordinate{x: (num.x + i), y: num.y},
+			schematic,
+		)
 
 		for _, v := range currentAdjacentValues {
 			allAdjacentValues = append(allAdjacentValues, v)
@@ -76,11 +79,13 @@ func (num partNum) isAdjacentToGearRatio(schematic []string) (bool, []string) {
 		}
 	}
 
-	if allAdjacentValues["topLeftCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["topLeftCoordinate"].value) {
+	if allAdjacentValues["topLeftCoordinate"].valid &&
+		singleDigitPattern.MatchString(allAdjacentValues["topLeftCoordinate"].value) {
 		numAdjacentGearRatios++
 		topRowHasRatios = true
 
-		if allAdjacentValues["topMiddleCoordinate"].valid && !singleDigitPattern.MatchString(allAdjacentValues["topMiddleCoordinate"].value) &&
+		if allAdjacentValues["topMiddleCoordinate"].valid &&
+			!singleDigitPattern.MatchString(allAdjacentValues["topMiddleCoordinate"].value) &&
 			(allAdjacentValues["topRightCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["topRightCoordinate"].value)) {
 			numAdjacentGearRatios++
 		}
@@ -93,21 +98,25 @@ func (num partNum) isAdjacentToGearRatio(schematic []string) (bool, []string) {
 		topRowHasRatios = true
 	}
 
-	if allAdjacentValues["leftCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["leftCoordinate"].value) {
+	if allAdjacentValues["leftCoordinate"].valid &&
+		singleDigitPattern.MatchString(allAdjacentValues["leftCoordinate"].value) {
 		numAdjacentGearRatios++
 		middleRowHasRatios = true
 	}
 
-	if allAdjacentValues["rightCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["rightCoordinate"].value) {
+	if allAdjacentValues["rightCoordinate"].valid &&
+		singleDigitPattern.MatchString(allAdjacentValues["rightCoordinate"].value) {
 		numAdjacentGearRatios++
 		middleRowHasRatios = true
 	}
 
-	if allAdjacentValues["bottomLeftCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["bottomLeftCoordinate"].value) {
+	if allAdjacentValues["bottomLeftCoordinate"].valid &&
+		singleDigitPattern.MatchString(allAdjacentValues["bottomLeftCoordinate"].value) {
 		numAdjacentGearRatios++
 		bottomRowHasRatios = true
 
-		if allAdjacentValues["bottomMiddleCoordinate"].valid && !singleDigitPattern.MatchString(allAdjacentValues["bottomMiddleCoordinate"].value) &&
+		if allAdjacentValues["bottomMiddleCoordinate"].valid &&
+			!singleDigitPattern.MatchString(allAdjacentValues["bottomMiddleCoordinate"].value) &&
 			(allAdjacentValues["bottomRightCoordinate"].valid && singleDigitPattern.MatchString(allAdjacentValues["bottomRightCoordinate"].value)) {
 			numAdjacentGearRatios++
 		}
@@ -130,7 +139,8 @@ func (num partNum) isAdjacentToGearRatio(schematic []string) (bool, []string) {
 			partNumLocations := partNumPattern.FindAllStringIndex(schematic[num.y-1], -1)
 
 			for _, v := range partNumLocations {
-				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) || (v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
+				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) ||
+					(v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
 					partNumPatterns = append(partNumPatterns, schematic[num.y-1][v[0]:v[1]])
 				}
 			}
@@ -140,7 +150,8 @@ func (num partNum) isAdjacentToGearRatio(schematic []string) (bool, []string) {
 			partNumLocations := partNumPattern.FindAllStringIndex(schematic[num.y], -1)
 
 			for _, v := range partNumLocations {
-				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) || (v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
+				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) ||
+					(v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
 					partNumPatterns = append(partNumPatterns, schematic[num.y][v[0]:v[1]])
 				}
 			}
@@ -150,7 +161,8 @@ func (num partNum) isAdjacentToGearRatio(schematic []string) (bool, []string) {
 			partNumLocations := partNumPattern.FindAllStringIndex(schematic[num.y+1], -1)
 
 			for _, v := range partNumLocations {
-				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) || (v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
+				if (v[0] >= (num.x-1) && v[0] <= (num.x+1)) ||
+					(v[1] > (num.x-1) && v[1] <= (num.x+2) || (v[0] < (num.x-1) && v[1] > (num.x+2))) {
 					partNumPatterns = append(partNumPatterns, schematic[num.y+1][v[0]:v[1]])
 				}
 			}
@@ -167,17 +179,34 @@ func getAdjacentCoordinates(element coordinate, schematic []string) map[string]c
 	elementYCoord := element.y
 	adjacentCoordinates := make(map[string]coordinate)
 
-	adjacentCoordinates["topLeftCoordinate"] = coordinate{x: elementXCoord - 1, y: elementYCoord - 1}
+	adjacentCoordinates["topLeftCoordinate"] = coordinate{
+		x: elementXCoord - 1,
+		y: elementYCoord - 1,
+	}
 	adjacentCoordinates["topMiddleCoordinate"] = coordinate{x: elementXCoord, y: elementYCoord - 1}
-	adjacentCoordinates["topRightCoordinate"] = coordinate{x: elementXCoord + 1, y: elementYCoord - 1}
+	adjacentCoordinates["topRightCoordinate"] = coordinate{
+		x: elementXCoord + 1,
+		y: elementYCoord - 1,
+	}
 	adjacentCoordinates["leftCoordinate"] = coordinate{x: elementXCoord - 1, y: elementYCoord}
 	adjacentCoordinates["rightCoordinate"] = coordinate{x: elementXCoord + 1, y: elementYCoord}
-	adjacentCoordinates["bottomLeftCoordinate"] = coordinate{x: elementXCoord - 1, y: elementYCoord + 1}
-	adjacentCoordinates["bottomMiddleCoordinate"] = coordinate{x: elementXCoord, y: elementYCoord + 1}
-	adjacentCoordinates["bottomRightCoordinate"] = coordinate{x: elementXCoord + 1, y: elementYCoord + 1}
+	adjacentCoordinates["bottomLeftCoordinate"] = coordinate{
+		x: elementXCoord - 1,
+		y: elementYCoord + 1,
+	}
+	adjacentCoordinates["bottomMiddleCoordinate"] = coordinate{
+		x: elementXCoord,
+		y: elementYCoord + 1,
+	}
+	adjacentCoordinates["bottomRightCoordinate"] = coordinate{
+		x: elementXCoord + 1,
+		y: elementYCoord + 1,
+	}
 
 	for elementLocation, adjacentElement := range adjacentCoordinates {
-		if adjacentElement.x >= 0 && adjacentElement.x < len(schematic[elementYCoord]) && adjacentElement.y >= 0 && adjacentElement.y < len(schematic) {
+		if adjacentElement.x >= 0 && adjacentElement.x < len(schematic[elementYCoord]) &&
+			adjacentElement.y >= 0 &&
+			adjacentElement.y < len(schematic) {
 			adjacentElement.value = string(schematic[adjacentElement.y][adjacentElement.x])
 			adjacentElement.valid = true
 			adjacentCoordinates[elementLocation] = adjacentElement
