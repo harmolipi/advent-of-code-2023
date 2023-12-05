@@ -22,33 +22,16 @@ type coordinate struct {
 }
 
 func (num partNum) isAdjacentToSymbol(schematic []string) bool {
-	var allAdjacentRunes []coordinate
+	var allAdjacentValues []coordinate
 
 	for i := range num.id {
-		currentCharXCoord := num.x + i
-		currentCharYCoord := num.y
-		var currentAdjacentRunes []coordinate
-
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord + 1, y: currentCharYCoord})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord - 1, y: currentCharYCoord})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord, y: currentCharYCoord + 1})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord, y: currentCharYCoord - 1})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord + 1, y: currentCharYCoord + 1})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord + 1, y: currentCharYCoord - 1})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord - 1, y: currentCharYCoord + 1})
-		currentAdjacentRunes = append(currentAdjacentRunes, coordinate{x: currentCharXCoord - 1, y: currentCharYCoord - 1})
-
-		for _, adjacentElement := range currentAdjacentRunes {
-			if adjacentElement.x >= 0 && adjacentElement.x < len(schematic[num.y]) && adjacentElement.y >= 0 && adjacentElement.y < len(schematic) {
-				adjacentElement.value = string(schematic[adjacentElement.y][adjacentElement.x])
-				allAdjacentRunes = append(allAdjacentRunes, adjacentElement)
-			}
-		}
+		currentAdjacentValues := getAdjacentCoordinates(coordinate{x: (num.x + i), y: num.y}, schematic)
+		allAdjacentValues = append(allAdjacentValues, currentAdjacentValues...)
 	}
 
 	hasAdjacentSymbol := false
 	symbolPattern := regexp.MustCompile(`[^a-zA-Z\d\.]`)
-	for _, v := range allAdjacentRunes {
+	for _, v := range allAdjacentValues {
 		if symbolPattern.MatchString(v.value) {
 			hasAdjacentSymbol = true
 			break
@@ -56,6 +39,31 @@ func (num partNum) isAdjacentToSymbol(schematic []string) bool {
 	}
 
 	return hasAdjacentSymbol
+}
+
+func getAdjacentCoordinates(element coordinate, schematic []string) []coordinate {
+	elementXCoord := element.x
+	elementYCoord := element.y
+	var allAdjacentValues []coordinate
+	var currentAdjacentCoordinates []coordinate
+
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord + 1, y: elementYCoord})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord - 1, y: elementYCoord})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord, y: elementYCoord + 1})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord, y: elementYCoord - 1})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord + 1, y: elementYCoord + 1})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord + 1, y: elementYCoord - 1})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord - 1, y: elementYCoord + 1})
+	currentAdjacentCoordinates = append(currentAdjacentCoordinates, coordinate{x: elementXCoord - 1, y: elementYCoord - 1})
+
+	for _, adjacentElement := range currentAdjacentCoordinates {
+		if adjacentElement.x >= 0 && adjacentElement.x < len(schematic[elementYCoord]) && adjacentElement.y >= 0 && adjacentElement.y < len(schematic) {
+			adjacentElement.value = string(schematic[adjacentElement.y][adjacentElement.x])
+			allAdjacentValues = append(allAdjacentValues, adjacentElement)
+		}
+	}
+
+	return allAdjacentValues
 }
 
 func getPartNumTotal(schematic []string) int {
