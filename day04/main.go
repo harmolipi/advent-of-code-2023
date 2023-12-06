@@ -46,6 +46,16 @@ func newCard(line string) scratchCard {
 	}
 }
 
+func getTotalScore(scratchCards []scratchCard) int {
+	score := 0
+
+	for _, v := range scratchCards {
+		score += v.score
+	}
+
+	return score
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Please include an input file as an argument.")
@@ -60,12 +70,14 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	totalScore := 0
+	var allScratchCards []scratchCard
 
 	for scanner.Scan() {
 		thisCard := newCard(scanner.Text())
-		totalScore += thisCard.score
+		allScratchCards = append(allScratchCards, thisCard)
 	}
+
+	totalScore := getTotalScore(allScratchCards)
 
 	fmt.Printf("The total score of this pile of cards is: %v\n", totalScore)
 }
